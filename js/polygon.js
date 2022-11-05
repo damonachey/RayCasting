@@ -2,7 +2,7 @@ import { Point } from './point.js';
 import { Segment } from './segment.js';
 
 export class Polygon {
-    constructor({ points }) {
+    constructor(points) {
         this.points = points;
     }
 
@@ -12,26 +12,26 @@ export class Polygon {
         return graphics;
     }
 
-    rotate({ origin = { x: 0, y: 0 }, angle }) {
+    rotate(angle, origin = { x: 0, y: 0 }) {
         this.points = this.points.map(point => point.rotate({ origin, angle }));
 
         return this;
     }
 
-    scale({ origin = { x: 0, y: 0 }, scale }) {
-        this.points = this.points.map(point => new Point({
-            x: origin.x + (point.x - origin.x) * scale,
-            y: origin.y + (point.y - origin.y) * scale,
-        }));
+    scale(scale, origin = { x: 0, y: 0 }) {
+        this.points = this.points.map(point => new Point(
+            origin.x + (point.x - origin.x) * scale,
+            origin.y + (point.y - origin.y) * scale
+            ));
 
         return this;
     }
 
-    translate({ x, y }) {
-        this.points = this.points.map(point => new Point({
-            x: point.x + x,
-            y: point.y + y,
-        }));
+    translate(x, y) {
+        this.points = this.points.map(point => new Point(
+            point.x + x,
+            point.y + y
+        ));
 
         return this;
     }
@@ -43,7 +43,7 @@ export class Polygon {
             const pointA = this.points[i];
             const pointB = this.points[i + 1] || this.points[0];
 
-            segments.push(new Segment({ pointA, pointB }));
+            segments.push(new Segment(pointA, pointB));
         }
 
         return segments;
