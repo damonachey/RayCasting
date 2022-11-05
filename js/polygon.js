@@ -1,4 +1,5 @@
 import { Point } from './point.js';
+import { Segment } from './segment.js';
 
 export class Polygon {
     constructor({ points }) {
@@ -12,16 +13,13 @@ export class Polygon {
     }
 
     rotate({ origin = { x: 0, y: 0 }, angle }) {
-        this.points = this.points.map((point) => new Point({
-            x: origin.x + (point.x - origin.x) * Math.cos(angle) - (point.y - origin.y) * Math.sin(angle),
-            y: origin.y + (point.y - origin.y) * Math.cos(angle) + (point.x - origin.x) * Math.sin(angle),
-        }));
+        this.points = this.points.map(point => point.rotate({ origin, angle }));
 
         return this;
     }
 
     scale({ origin = { x: 0, y: 0 }, scale }) {
-        this.points = this.points.map((point) => new Point({
+        this.points = this.points.map(point => new Point({
             x: origin.x + (point.x - origin.x) * scale,
             y: origin.y + (point.y - origin.y) * scale,
         }));
@@ -30,13 +28,24 @@ export class Polygon {
     }
 
     translate({ x, y }) {
-        this.points = this.points.map((point) => new Point({
+        this.points = this.points.map(point => new Point({
             x: point.x + x,
             y: point.y + y,
         }));
 
-        console.log(this.points);
-
         return this;
+    }
+
+    getSegments() {
+        const segments = [];
+
+        for (let i = 0; i < this.points.length; i++) {
+            const pointA = this.points[i];
+            const pointB = this.points[i + 1] || this.points[0];
+
+            segments.push(new Segment({ pointA, pointB }));
+        }
+
+        return segments;
     }
 }

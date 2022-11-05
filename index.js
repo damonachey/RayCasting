@@ -10,9 +10,10 @@ const app = new PIXI.Application({
     antialias: true,
 });
 
+const justABigNumber = 1000000;
+
 let pause = false;
 let wireFrame = false;
-
 let mouse = { x: 0, y: 0 };
 
 window.addEventListener('keydown', function (event) {
@@ -30,6 +31,8 @@ app.stage.addChild(g);
 const color = 0x0000ff;
 
 const corners = { points: [{ x: 0, y: 0 }, { x: view.width, y: 0 }, { x: view.width, y: view.height }, { x: 0, y: view.height }] };
+const light = new RegularPolygon({ facets: 10 }).scale(10);
+
 const triangle = new RegularPolygon({ facets: 3 }).scale({ scale: 100 }).translate({ x: 200, y: 200 });
 const square = new RegularPolygon({ facets: 4 }).scale({ scale: 100 }).translate({ x: 600, y: 200 });
 const pentagon = new RegularPolygon({ facets: 5 }).scale({ scale: 100 }).translate({ x: 200, y: 600 });
@@ -40,6 +43,8 @@ const polygons = [triangle, square, pentagon, circle, pacman];
 
 app.ticker.add(() => {
     if (pause) return;
+    if (mouse.x > view.width) return;
+    if (mouse.y > view.height) return;
 
     g.clear();
     g.lineStyle(1, color, 1);
@@ -48,7 +53,14 @@ app.ticker.add(() => {
         g.beginFill(color);
     }
 
-    polygons.forEach((polygon) => polygon.draw(g));
+    const polygonPoints = [];
+
+    polygons.forEach(polygon => polygon.points.forEach(point => {
+        polygonPoints.push(point.rotate({ origin: mouse, angle: 1 / justABigNumber }));
+        polygonPoints.push(point.rotate({ origin: mouse, angle: -1 / justABigNumber }));
+    }));
+
+    polygons.forEach(polygon => polygon.draw(g));
 
     if (!wireFrame) {
         g.endFill();
