@@ -10,11 +10,6 @@ export class Segment {
         return Math.atan2(this.point2.y - this.point1.y, this.point2.x - this.point1.x);
     }
 
-    draw(graphics) {
-        graphics.moveTo(this.point1.x, this.point1.y);
-        graphics.lineTo(this.point2.x, this.point2.y);
-    }
-
     extend(length) {
         const angle = this.angle();
         const x = this.point2.x + Math.cos(angle) * length;

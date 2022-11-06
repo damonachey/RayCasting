@@ -6,10 +6,6 @@ export class Polygon {
         this.points = points;
     }
 
-    draw(graphics) {
-        graphics.drawPolygon(this.points);
-    }
-
     rotate(angle, origin = { x: 0, y: 0 }) {
         return new Polygon(this.points.map(point => point.rotate(angle, origin)));
     }

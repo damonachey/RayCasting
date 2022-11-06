@@ -10,28 +10,26 @@ const canvasFps = document.getElementById('canvasFps');
 const pixiCanvas = document.getElementById('pixiCanvas');
 const pixiFps = document.getElementById('pixiFps');
 
-const p5Canvas = document.getElementById('p5Canvas');
-const p5Fps = document.getElementById('p5Fps');
+const pixiBlue = 0x0000ff;
+const pixiGreen = 0x00ff00;
+const pixiWhite = 0xffffff;
+const pixiBackground = 0x1e1e1e;
+const canvasBlue = '#00f';
+const canvasGreen = '#0f0';
+const canvasWhite = '#fff';
+const canvasBackground = '#1e1e1e';
+const justABigNumber = 1000000;
 
 const app = new PIXI.Application({
     view: pixiCanvas,
     width: canvasCanvas.width,
     height: canvasCanvas.height,
-    backgroundColor: 0x1e1e1e,
+    backgroundColor: pixiBackground,
     antialias: true,
 });
 
 let canvasRect = canvasCanvas.getBoundingClientRect();
 let pixiRect = pixiCanvas.getBoundingClientRect();
-let p5Rect = p5Canvas.getBoundingClientRect();
-
-const pixiBlue = 0x0000ff;
-const pixiGreen = 0x00ff00;
-const pixiWhite = 0xffffff;
-const canvasBlue = '#00f';
-const canvasGreen = '#0f0';
-const canvasWhite = '#fff';
-const justABigNumber = 1000000;
 
 let pause = false;
 let wireFrame = false;
@@ -49,14 +47,11 @@ window.addEventListener('keydown', event => {
     if (event.key == 'w') wireFrame = !wireFrame;
 });
 
-canvasCanvas.addEventListener('mousemove', event => 
+canvasCanvas.addEventListener('mousemove', event =>
     mouse = new Point(event.clientX - canvasRect.left, event.clientY - canvasRect.top));
 
 pixiCanvas.addEventListener('mousemove', event =>
     mouse = new Point(event.clientX - pixiRect.left, event.clientY - pixiRect.top));
-
-p5Canvas.addEventListener('mousemove', event =>
-    mouse = new Point(event.clientX - p5Rect.left, event.clientY - p5Rect.top));
 
 const corners = new Polygon([new Point(0, 0), new Point(canvasCanvas.width, 0), new Point(canvasCanvas.width, canvasCanvas.height), new Point(0, canvasCanvas.height)]);
 const triangle = new RegularPolygon(3).scale(75).translate(150, 150);
@@ -73,10 +68,72 @@ polygons.forEach(polygon => polygonSegments.push(...polygon.segments()));
 const ctx = canvasCanvas.getContext('2d');
 updateCanvas();
 
-const g = new PIXI.Graphics();
-app.stage.addChild(g);
+const graphics = new PIXI.Graphics();
+app.stage.addChild(graphics);
 app.ticker.add(updatePixi, PIXI.UPDATE_PRIORITY.LOW);
 app.ticker.start();
+
+const p5Fps = document.getElementById('p5Fps');
+let p5Rect;
+new p5(function (p5context) {
+    p5context.setup = function setup() {
+        p5context.createCanvas(canvasCanvas.width, canvasCanvas.height).parent('p5Parent');
+        p5Rect = p5context.canvas.getBoundingClientRect();
+        p5context.canvas.addEventListener('mousemove', event =>
+            mouse = new Point(event.clientX - p5Rect.left, event.clientY - p5Rect.top));
+    }
+
+    p5context.draw = function updateP5() {
+        if (pause) return;
+        if (mouse.x > canvasCanvas.width) return;
+        if (mouse.y > canvasCanvas.height) return;
+
+        const rays = getRays();
+
+        p5context
+            .clear()
+            .background(canvasBackground)
+            .noFill();
+
+        p5context.stroke(canvasBlue);
+        if (!wireFrame) {
+            p5context.fill(canvasBlue);
+        }
+        polygons.forEach(polygon => {
+            p5context.beginShape();
+            polygon.points.forEach(point => p5context.vertex(point.x, point.y));
+            p5context.endShape(p5context.CLOSE);
+        });
+
+        p5context.stroke(canvasWhite);
+        if (!wireFrame) {
+            p5context.fill(canvasWhite);
+        }
+        for (var i = 0; i < rays.length; i++) {
+            const ray = rays[i];
+
+            if (!wireFrame) {
+                const nextRay = rays[i + 1] || rays[0];
+    
+                p5context.fill(pixiWhite);
+                p5context.beginShape();
+                [mouse, ray.point2, nextRay.point2].forEach(point => p5context.vertex(point.x, point.y));
+                p5context.endShape(p5context.CLOSE);
+            }
+            else {
+                p5context.line(ray.point1.x, ray.point1.y, ray.point2.x, ray.point2.y);
+            }
+        }
+
+        p5context.stroke(canvasGreen);
+        if (!wireFrame) {
+            p5context.fill(canvasGreen);
+        }
+        p5context.circle(mouse.x, mouse.y, 20);
+
+        p5Fps.innerText = p5context.frameRate().toFixed(0);
+    };
+});
 
 function updateCanvas() {
     requestAnimationFrame(updateCanvas);
@@ -148,40 +205,45 @@ function updatePixi() {
 
     const rays = getRays();
 
-    g.clear();
-    g.lineStyle(1, pixiBlue);
+    graphics
+        .clear()
+        .lineStyle(1, pixiBlue);
 
     if (!wireFrame) {
-        g.beginFill(pixiBlue);
+        graphics.beginFill(pixiBlue);
     }
 
-    polygons.forEach(polygon => polygon.draw(g));
+    polygons.forEach(polygon => graphics.drawPolygon(polygon.points));
 
-    g.lineStyle(1, pixiWhite);
+    graphics.lineStyle(1, pixiWhite);
 
-    if (!wireFrame) {
-        g.beginFill(pixiWhite);
+    for (var i = 0; i < rays.length; i++) {
+        const ray = rays[i];
 
-        for (var i = 0; i < rays.length; i++) {
-            const ray = rays[i];
+        if (!wireFrame) {
             const nextRay = rays[i + 1] || rays[0];
 
-            g.drawPolygon([mouse, ray.point2, nextRay.point2]);
+            graphics
+                .beginFill(pixiWhite)
+                .drawPolygon([mouse, ray.point2, nextRay.point2]);
+        }
+        else {
+            graphics
+                .moveTo(ray.point1.x, ray.point1.y)
+                .lineTo(ray.point2.x, ray.point2.y);
         }
     }
-    else {
-        rays.forEach(ray => ray.draw(g));
-    }
 
     if (!wireFrame) {
-        g.beginFill(pixiGreen);
+        graphics.beginFill(pixiGreen);
     }
 
-    g.lineStyle(1, pixiGreen);
-    g.drawCircle(mouse.x, mouse.y, 10);
+    graphics
+        .lineStyle(1, pixiGreen)
+        .drawCircle(mouse.x, mouse.y, 10);
 
     if (!wireFrame) {
-        g.endFill();
+        graphics.endFill();
     }
 
     pixiFps.innerHTML = app.ticker.FPS.toFixed(0);
