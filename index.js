@@ -4,10 +4,10 @@ import { Segment } from './js/segment.js';
 import { Point } from './js/point.js';
 import { Polygon } from './js/polygon.js';
 
-const view = document.getElementById('view');
+const canvas = document.getElementById('canvas');
 const fps = document.getElementById('fps');
 const app = new PIXI.Application({
-    view: view,
+    view: canvas,
     width: 800,
     height: 800,
     backgroundColor: 0x1e1e1e,
@@ -21,23 +21,17 @@ const justABigNumber = 1000000;
 
 let pause = false;
 let wireFrame = false;
-let mouse = new Point(0, 0);
+let mouse = new Point(1, 1);
 
-window.addEventListener('keydown', function (event) {
+window.addEventListener('keydown', event => {
     if (event.key == 'p') pause = !pause;
     if (event.key == 'w') wireFrame = !wireFrame;
 });
 
-view.addEventListener('mousemove', function (event) {
-    mouse = new Point(event.clientX - event.currentTarget.offsetLeft, event.clientY - event.currentTarget.offsetTop);
-});
+canvas.addEventListener('mousemove', event =>
+    mouse = new Point(event.clientX - event.currentTarget.offsetLeft, event.clientY - event.currentTarget.offsetTop));
 
-const g = new PIXI.Graphics();
-app.stage.addChild(g);
-
-const corners = new Polygon([new Point(0, 0), new Point(view.width, 0), new Point(view.width, view.height), new Point(0, view.height)]);
-const light = new RegularPolygon(10).scale(10);
-
+const corners = new Polygon([new Point(0, 0), new Point(canvas.width, 0), new Point(canvas.width, canvas.height), new Point(0, canvas.height)]);
 const triangle = new RegularPolygon(3).scale(100).translate(200, 200);
 const square = new RegularPolygon(4).scale(100).translate(600, 200);
 const pentagon = new RegularPolygon(5).scale(100).translate(200, 600);
@@ -49,13 +43,15 @@ const polygonSegments = [];
 
 polygons.forEach(polygon => polygonSegments.push(...polygon.getSegments()));
 
+const g = new PIXI.Graphics();
+app.stage.addChild(g);
 app.ticker.add(update, PIXI.UPDATE_PRIORITY.LOW);
 app.ticker.start();
 
 function update() {
     if (pause) return;
-    if (mouse.x > view.width) return;
-    if (mouse.y > view.height) return;
+    if (mouse.x > canvas.width) return;
+    if (mouse.y > canvas.height) return;
 
     const rays = getRays();
 
@@ -88,7 +84,8 @@ function update() {
         g.beginFill(green);
     }
 
-    light.clone().translate(mouse.x, mouse.y).draw(g);
+    g.lineStyle(1, green);
+    g.drawCircle(mouse.x, mouse.y, 10);
 
     if (!wireFrame) {
         g.endFill();
@@ -115,9 +112,7 @@ function getRays() {
             const intersection = segment.intersection(ray);
 
             if (intersection) {
-                const distance = mouse.distance(intersection);
-
-                if (distance < shortest.length()) {
+                if (mouse.distance(intersection) < shortest.length()) {
                     shortest = new Segment(mouse, intersection);
                 }
             }
