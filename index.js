@@ -25,6 +25,36 @@ const polygonSegments = [];
 
 polygons.forEach(polygon => polygonSegments.push(...polygon.segments()));
 
+function getRays(mouse) {
+    const polygonPoints = [...corners.points];
+
+    polygons.forEach(polygon => polygon.points.forEach(point => {
+        polygonPoints.push(point.rotate(1 / justABigNumber, mouse));
+        polygonPoints.push(point.rotate(-1 / justABigNumber, mouse));
+    }));
+
+    const rays = [];
+
+    polygonPoints.forEach(point => {
+        const ray = new Segment(mouse, point).extend(justABigNumber);
+        let shortest = ray;
+
+        polygonSegments.forEach(segment => {
+            const intersection = segment.intersection(ray);
+
+            if (intersection) {
+                if (mouse.distance(intersection) < shortest.length()) {
+                    shortest = new Segment(mouse, intersection);
+                }
+            }
+        });
+
+        rays.push(shortest);
+    });
+
+    return rays.sort((a, b) => a.angle() - b.angle());
+}
+
 let pause = false;
 let filled = true;
 let mouse = new Point(1, 1);
@@ -53,7 +83,7 @@ window.addEventListener('keydown', event => {
         if (mouse.x > canvas.width) return;
         if (mouse.y > canvas.height) return;
 
-        const rays = getRays();
+        const rays = getRays(mouse);
 
         context.fillStyle = canvas.style.borderColor;
         context.rect(0, 0, canvas.width, canvas.height);
@@ -142,7 +172,7 @@ window.addEventListener('keydown', event => {
         if (mouse.x > canvas.width) return;
         if (mouse.y > canvas.height) return;
 
-        const rays = getRays();
+        const rays = getRays(mouse);
 
         graphics
             .clear()
@@ -213,7 +243,7 @@ window.addEventListener('keydown', event => {
             if (mouse.x > canvas.width) return;
             if (mouse.y > canvas.height) return;
 
-            const rays = getRays();
+            const rays = getRays(mouse);
 
             p5context
                 .clear()
@@ -266,33 +296,3 @@ window.addEventListener('keydown', event => {
         };
     });
 }());
-
-function getRays() {
-    const polygonPoints = [...corners.points];
-
-    polygons.forEach(polygon => polygon.points.forEach(point => {
-        polygonPoints.push(point.rotate(1 / justABigNumber, mouse));
-        polygonPoints.push(point.rotate(-1 / justABigNumber, mouse));
-    }));
-
-    const rays = [];
-
-    polygonPoints.forEach(point => {
-        const ray = new Segment(mouse, point).extend(justABigNumber);
-        let shortest = ray;
-
-        polygonSegments.forEach(segment => {
-            const intersection = segment.intersection(ray);
-
-            if (intersection) {
-                if (mouse.distance(intersection) < shortest.length()) {
-                    shortest = new Segment(mouse, intersection);
-                }
-            }
-        });
-
-        rays.push(shortest);
-    });
-
-    return rays.sort((a, b) => a.angle() - b.angle());
-}
