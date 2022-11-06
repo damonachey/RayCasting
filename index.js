@@ -69,8 +69,11 @@ window.addEventListener('keydown', event => {
     const fps = document.getElementById('canvasFps');
 
     let lastTime = performance.now();
-    let rect = canvas.getBoundingClientRect();
-    canvas.addEventListener('mousemove', event => mouse = new Point(event.clientX - rect.left, event.clientY - rect.top));
+    canvas.addEventListener('mousemove', event => 
+    {
+        const rect = canvas.getBoundingClientRect();
+        mouse = new Point(event.clientX - rect.left, event.clientY - rect.top);
+    });
     window.addEventListener('resize', () => rect = canvas.getBoundingClientRect());
 
     const context = canvas.getContext('2d');
@@ -145,8 +148,10 @@ window.addEventListener('keydown', event => {
     const canvas = document.getElementById('pixiCanvas');
     const fps = document.getElementById('pixiFps');
 
-    let rect = canvas.getBoundingClientRect();
-    canvas.addEventListener('mousemove', event => mouse = new Point(event.clientX - rect.left, event.clientY - rect.top));
+    canvas.addEventListener('mousemove', event => {
+        const rect = canvas.getBoundingClientRect();
+        mouse = new Point(event.clientX - rect.left, event.clientY - rect.top); 
+    });
     window.addEventListener('resize', () => rect = canvas.getBoundingClientRect());
 
     const graphics = new PIXI.Graphics();
@@ -228,8 +233,10 @@ window.addEventListener('keydown', event => {
 
             canvas.style.border = '1px solid ' + background;
 
-            let p5Rect = canvas.getBoundingClientRect();
-            canvas.addEventListener('mousemove', event => mouse = new Point(event.clientX - p5Rect.left, event.clientY - p5Rect.top));
+            canvas.addEventListener('mousemove', event => {
+                const rect = canvas.getBoundingClientRect();
+                mouse = new Point(event.clientX - rect.left, event.clientY - rect.top);
+            });
             window.addEventListener('resize', () => p5Rect = canvas.getBoundingClientRect());
         }
 
