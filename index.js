@@ -136,7 +136,7 @@ window.addEventListener('keydown', event => {
         context.stroke();
 
         const now = performance.now();
-        fps.innerHTML = Math.round(1000 / (now - lastTime)).toFixed(0);
+        fps.innerText = Math.round(1000 / (now - lastTime)).toFixed(0);
         lastTime = now;
     }
 })();
@@ -214,7 +214,7 @@ window.addEventListener('keydown', event => {
             graphics.endFill();
         }
 
-        fps.innerHTML = app.ticker.FPS.toFixed(0);
+        fps.innerText = app.ticker.FPS.toFixed(0);
     }
 }());
 
