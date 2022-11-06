@@ -73,7 +73,7 @@ function update() {
             const ray = rays[i];
             const nextRay = rays[i + 1] || rays[0];
 
-            g.drawPolygon([mouse, ray.p2, nextRay.p2]);
+            g.drawPolygon([mouse, ray.point2, nextRay.point2]);
         }
     }
     else {

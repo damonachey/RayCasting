@@ -1,44 +1,44 @@
 import { Point } from './point.js';
 
 export class Segment {
-    constructor(p1, p2) {
-        this.p1 = p1;
-        this.p2 = p2;
+    constructor(point1, point2) {
+        this.point1 = point1;
+        this.point2 = point2;
     }
 
     angle() {
-        return Math.atan2(this.p2.y - this.p1.y, this.p2.x - this.p1.x);
+        return Math.atan2(this.point2.y - this.point1.y, this.point2.x - this.point1.x);
     }
 
     draw(graphics) {
-        graphics.moveTo(this.p1.x, this.p1.y);
-        graphics.lineTo(this.p2.x, this.p2.y);
+        graphics.moveTo(this.point1.x, this.point1.y);
+        graphics.lineTo(this.point2.x, this.point2.y);
     }
 
     extend(length) {
         const angle = this.angle();
-        const x = this.p2.x + Math.cos(angle) * length;
-        const y = this.p2.y + Math.sin(angle) * length;
-        return new Segment(this.p1, new Point(x, y));
+        const x = this.point2.x + Math.cos(angle) * length;
+        const y = this.point2.y + Math.sin(angle) * length;
+        return new Segment(this.point1, new Point(x, y));
     }
 
     intersection(segment) {
-        const r = this.p2.subtract(this.p1);
-        const s = segment.p2.subtract(segment.p1);
+        const r = this.point2.subtract(this.point1);
+        const s = segment.point2.subtract(segment.point1);
         const rxs = r.crossProduct(s);
-        const cma = segment.p1.subtract(this.p1);
+        const cma = segment.point1.subtract(this.point1);
         const t = cma.crossProduct(s) / rxs;
         const u = cma.crossProduct(r) / rxs;
 
         if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
             return new Point(
-                this.p1.x + t * r.x,
-                this.p1.y + t * r.y
+                this.point1.x + t * r.x,
+                this.point1.y + t * r.y
             );
         }
     }
 
     length() {
-        return this.p2.distance(this.p1);
+        return this.point2.distance(this.point1);
     }
 }
