@@ -41,7 +41,7 @@ const pacman = new Pacman().scale(100).translate(400, 400);
 const polygons = [triangle, square, pentagon, circle, pacman];
 const polygonSegments = [];
 
-polygons.forEach(polygon => polygonSegments.push(...polygon.getSegments()));
+polygons.forEach(polygon => polygonSegments.push(...polygon.segments()));
 
 const g = new PIXI.Graphics();
 app.stage.addChild(g);

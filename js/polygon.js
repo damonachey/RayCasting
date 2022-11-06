@@ -34,7 +34,7 @@ export class Polygon {
         return this;
     }
 
-    getSegments() {
+    segments() {
         const segments = [];
 
         for (let i = 0; i < this.points.length; i++) {
