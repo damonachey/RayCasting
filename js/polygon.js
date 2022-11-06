@@ -11,27 +11,21 @@ export class Polygon {
     }
 
     rotate(angle, origin = { x: 0, y: 0 }) {
-        this.points = this.points.map(point => point.rotate(angle, origin));
-
-        return this;
+        return new Polygon(this.points.map(point => point.rotate(angle, origin)));
     }
 
     scale(scale, origin = { x: 0, y: 0 }) {
-        this.points = this.points.map(point => new Point(
+        return new Polygon(this.points.map(point => new Point(
             origin.x + (point.x - origin.x) * scale,
             origin.y + (point.y - origin.y) * scale
-            ));
-
-        return this;
+            )));
     }
 
     translate(x, y) {
-        this.points = this.points.map(point => new Point(
+        return new Polygon(this.points.map(point => new Point(
             point.x + x,
             point.y + y
-        ));
-
-        return this;
+        )));
     }
 
     segments() {
