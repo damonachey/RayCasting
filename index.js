@@ -58,7 +58,6 @@ function getRays(mouse) {
 let pause = false;
 let filled = true;
 let mouse = new Point(1, 1);
-let canvasLastTime = performance.now();
 
 window.addEventListener('keydown', event => {
     if (event.key.toLowerCase() == 'p') pause = !pause;
@@ -69,6 +68,7 @@ window.addEventListener('keydown', event => {
     const canvas = document.getElementById('canvasCanvas');
     const fps = document.getElementById('canvasFps');
 
+    let lastTime = performance.now();
     let rect = canvas.getBoundingClientRect();
     canvas.addEventListener('mousemove', event => mouse = new Point(event.clientX - rect.left, event.clientY - rect.top));
     window.addEventListener('resize', () => rect = canvas.getBoundingClientRect());
@@ -136,8 +136,8 @@ window.addEventListener('keydown', event => {
         context.stroke();
 
         const now = performance.now();
-        fps.innerHTML = Math.round(1000 / (now - canvasLastTime)).toFixed(0);
-        canvasLastTime = now;
+        fps.innerHTML = Math.round(1000 / (now - lastTime)).toFixed(0);
+        lastTime = now;
     }
 })();
 
@@ -167,6 +167,14 @@ window.addEventListener('keydown', event => {
     app.ticker.add(update, PIXI.UPDATE_PRIORITY.LOW);
     app.ticker.start();
 
+    function setColor(color) {
+        graphics.lineStyle(1, color);
+
+        if (filled) {
+            graphics.beginFill(color);
+        }
+    }
+
     function update() {
         if (pause) return;
         if (mouse.x > canvas.width) return;
@@ -174,27 +182,22 @@ window.addEventListener('keydown', event => {
 
         const rays = getRays(mouse);
 
-        graphics
-            .clear()
-            .lineStyle(1, blue);
+        graphics.clear();
 
-        if (filled) {
-            graphics.beginFill(blue);
-        }
+        setColor(blue);
 
         polygons.forEach(polygon => graphics.drawPolygon(polygon.points));
 
-        graphics.lineStyle(1, white);
+        setColor(white);
 
         for (var i = 0; i < rays.length; i++) {
             const ray = rays[i];
 
             if (filled) {
                 const nextRay = rays[i + 1] || rays[0];
+                const rayPolygon = new Polygon([mouse, ray.point2, nextRay.point2]);
 
-                graphics
-                    .beginFill(white)
-                    .drawPolygon([mouse, ray.point2, nextRay.point2]);
+                graphics.drawPolygon(rayPolygon.points);
             }
             else {
                 graphics
@@ -203,13 +206,9 @@ window.addEventListener('keydown', event => {
             }
         }
 
-        if (filled) {
-            graphics.beginFill(green);
-        }
+        setColor(green);
 
-        graphics
-            .lineStyle(1, green)
-            .drawCircle(mouse.x, mouse.y, 10);
+        graphics.drawCircle(mouse.x, mouse.y, 10);
 
         if (filled) {
             graphics.endFill();
@@ -238,6 +237,14 @@ window.addEventListener('keydown', event => {
             window.addEventListener('resize', () => p5Rect = canvas.getBoundingClientRect());
         }
 
+        function setColor(color) {
+            p5context.stroke(color);
+
+            if (filled) {
+                p5context.fill(color);
+            }
+        }
+
         p5context.draw = function update() {
             if (pause) return;
             if (mouse.x > canvas.width) return;
@@ -250,11 +257,7 @@ window.addEventListener('keydown', event => {
                 .background(background)
                 .noFill();
 
-            p5context.stroke(blue);
-
-            if (filled) {
-                p5context.fill(blue);
-            }
+            setColor(blue);
 
             polygons.forEach(polygon => {
                 p5context.beginShape();
@@ -262,21 +265,17 @@ window.addEventListener('keydown', event => {
                 p5context.endShape(p5context.CLOSE);
             });
 
-            p5context.stroke(white);
-
-            if (filled) {
-                p5context.fill(white);
-            }
+            setColor(white);
 
             for (var i = 0; i < rays.length; i++) {
                 const ray = rays[i];
 
                 if (filled) {
                     const nextRay = rays[i + 1] || rays[0];
+                    const rayPolygon = new Polygon([mouse, ray.point2, nextRay.point2]);
 
-                    p5context.fill(white);
                     p5context.beginShape();
-                    [mouse, ray.point2, nextRay.point2].forEach(point => p5context.vertex(point.x, point.y));
+                    rayPolygon.points.forEach(point => p5context.vertex(point.x, point.y));
                     p5context.endShape(p5context.CLOSE);
                 }
                 else {
@@ -284,11 +283,7 @@ window.addEventListener('keydown', event => {
                 }
             }
 
-            p5context.stroke(green);
-            
-            if (filled) {
-                p5context.fill(green);
-            }
+            setColor(green);
 
             p5context.circle(mouse.x, mouse.y, 20);
 
