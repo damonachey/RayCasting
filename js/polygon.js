@@ -6,10 +6,6 @@ export class Polygon {
         this.points = points;
     }
 
-    clone() {
-        return new Polygon(this.points.map(point => new Point(point.x, point.y)));
-    }
-
     draw(graphics) {
         graphics.drawPolygon(this.points);
     }
