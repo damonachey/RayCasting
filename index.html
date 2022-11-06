@@ -1,14 +1,32 @@
 <!doctype html>
 <html>
-
+<style>
+    div { 
+        float: left;
+        margin: 10px;
+    }
+</style>
 <head>
 </head>
 
 <body>
-    <canvas id="canvas" style="border:1px solid #1e1e1e;"></canvas><br/>
-    W - toggle wireframe<br/>
-    P - toggle pause<br/>
-    FPS: <span id="fps"></span>
+    W - toggle wireframe<br />
+    P - toggle pause<br />
+    <div>
+        <canvas id="canvasCanvas" width="600" height="600" style="border:1px solid #1e1e1e;"></canvas><br />
+        Native Canvas<br />
+        FPS: <span id="canvasFps"></span><br />
+    </div>
+    <div>
+        <canvas id="pixiCanvas" style="border:1px solid #1e1e1e;"></canvas><br />
+        PixiJS<br />
+        FPS: <span id="pixiFps"></span><br />
+    </div>
+    <div>
+        <canvas id="p5Canvas" style="border:1px solid #1e1e1e;"></canvas><br />
+        p5JS<br />
+        FPS: <span id="p5Fps"></span><br />
+    </div>
 </body>
 
 <script src="https://pixijs.download/release/pixi.js"></script>
