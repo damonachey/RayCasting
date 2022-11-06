@@ -74,7 +74,6 @@ window.addEventListener('keydown', event => {
         const rect = canvas.getBoundingClientRect();
         mouse = new Point(event.clientX - rect.left, event.clientY - rect.top);
     });
-    window.addEventListener('resize', () => rect = canvas.getBoundingClientRect());
 
     const context = canvas.getContext('2d');
     update(); // kick start for requestAnimationFrame
@@ -152,7 +151,6 @@ window.addEventListener('keydown', event => {
         const rect = canvas.getBoundingClientRect();
         mouse = new Point(event.clientX - rect.left, event.clientY - rect.top); 
     });
-    window.addEventListener('resize', () => rect = canvas.getBoundingClientRect());
 
     const graphics = new PIXI.Graphics();
     const app = new PIXI.Application({
@@ -237,7 +235,6 @@ window.addEventListener('keydown', event => {
                 const rect = canvas.getBoundingClientRect();
                 mouse = new Point(event.clientX - rect.left, event.clientY - rect.top);
             });
-            window.addEventListener('resize', () => p5Rect = canvas.getBoundingClientRect());
         }
 
         function setColor(color) {
