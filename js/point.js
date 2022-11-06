@@ -4,6 +4,10 @@ export class Point {
         this.y = y;
     }
 
+    crossProduct(point) {
+        return this.x * point.y - this.y * point.x;
+    }
+
     distance(point) {
         return Math.sqrt(Math.pow(point.x - this.x, 2) + Math.pow(point.y - this.y, 2));
     }
@@ -13,5 +17,9 @@ export class Point {
             origin.x + (this.x - origin.x) * Math.cos(angle) - (this.y - origin.y) * Math.sin(angle),
             origin.y + (this.y - origin.y) * Math.cos(angle) + (this.x - origin.x) * Math.sin(angle)
         );
+    }
+
+    subtract(point) {
+        return new Point(this.x - point.x, this.y - point.y);
     }
 }

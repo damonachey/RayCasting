@@ -6,14 +6,16 @@ export class Polygon {
         this.points = points;
     }
 
+    clone() {
+        return new Polygon(this.points.map(point => new Point(point.x, point.y)));
+    }
+
     draw(graphics) {
         graphics.drawPolygon(this.points);
-
-        return graphics;
     }
 
     rotate(angle, origin = { x: 0, y: 0 }) {
-        this.points = this.points.map(point => point.rotate({ origin, angle }));
+        this.points = this.points.map(point => point.rotate(angle, origin));
 
         return this;
     }
