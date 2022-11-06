@@ -7,9 +7,9 @@ import { Polygon } from './js/polygon.js';
 const width = 600;
 const height = 600;
 
-const blue = '#00f';
-const green = '#0f0';
-const white = '#fff';
+const blue = '#0000ff';
+const green = '#00ff00';
+const white = '#ffffff';
 const background = '#1e1e1e';
 const justABigNumber = 1000000;
 
@@ -142,12 +142,6 @@ window.addEventListener('keydown', event => {
 })();
 
 (function startPixi() {
-    // pixi uses binary color values
-    const blue = 0x0000ff;
-    const green = 0x00ff00;
-    const white = 0xffffff;
-    const background = 0x1e1e1e;
-
     const canvas = document.getElementById('pixiCanvas');
     const fps = document.getElementById('pixiFps');
 
@@ -160,7 +154,7 @@ window.addEventListener('keydown', event => {
         view: canvas,
         width: canvas.width,
         height: canvas.height,
-        backgroundColor: background,
+        backgroundColor: PIXI.utils.string2hex(background),
         antialias: true,
     });
     app.stage.addChild(graphics);
@@ -168,10 +162,12 @@ window.addEventListener('keydown', event => {
     app.ticker.start();
 
     function setColor(color) {
-        graphics.lineStyle(1, color);
+        const hex = PIXI.utils.string2hex(color);
+
+        graphics.lineStyle(1, hex);
 
         if (filled) {
-            graphics.beginFill(color);
+            graphics.beginFill(hex);
         }
     }
 
