@@ -21,38 +21,28 @@ const circle = new RegularPolygon(60).scale(75).translate(450, 450);
 const pacman = new Pacman().scale(75).translate(300, 300);
 
 const polygons = [triangle, square, pentagon, circle, pacman];
-const polygonSegments = [];
-
-polygons.forEach(polygon => polygonSegments.push(...polygon.segments()));
+const polygonSegments = polygons.flatMap(polygon => polygon.segments());
 
 function getRays(mouse) {
-    const polygonPoints = [...corners.points];
+    const getPointsBothSides = point => [
+        point.rotate(1 / justABigNumber, mouse),
+        point.rotate(-1 / justABigNumber, mouse),
+    ];
 
-    polygons.forEach(polygon => polygon.points.forEach(point => {
-        polygonPoints.push(point.rotate(1 / justABigNumber, mouse));
-        polygonPoints.push(point.rotate(-1 / justABigNumber, mouse));
-    }));
+    const getRayFromMouseThroughPoint = point => new Segment(mouse, point).extend(justABigNumber);
 
-    const rays = [];
+    const getShortestCastRay = ray => polygonSegments
+        .map(segment => segment.intersection(ray) || ray.point2)
+        .map(point => new Segment(mouse, point))
+        .reduce((shortest, ray) => ray.length() < shortest.length() ? ray : shortest, ray);
 
-    polygonPoints.forEach(point => {
-        const ray = new Segment(mouse, point).extend(justABigNumber);
-        let shortest = ray;
-
-        polygonSegments.forEach(segment => {
-            const intersection = segment.intersection(ray);
-
-            if (intersection) {
-                if (mouse.distance(intersection) < shortest.length()) {
-                    shortest = new Segment(mouse, intersection);
-                }
-            }
-        });
-
-        rays.push(shortest);
-    });
-
-    return rays.sort((a, b) => a.angle() - b.angle());
+    return polygons
+        .flatMap(polygon => polygon.points)
+        .flatMap(getPointsBothSides)
+        .concat(corners.points)
+        .map(getRayFromMouseThroughPoint)
+        .map(getShortestCastRay)
+        .sort((a, b) => a.angle() - b.angle());
 }
 
 let pause = false;
