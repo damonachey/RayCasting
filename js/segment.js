@@ -1,4 +1,5 @@
-import { Point } from './point.js';
+import { Point } from './point.js';\
+
 export class Segment {
     constructor(p1, p2) {
         this.p1 = p1;
