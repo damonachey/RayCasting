@@ -19,6 +19,7 @@ const square = new RegularPolygon(4).scale(75).translate(450, 150);
 const pentagon = new RegularPolygon(5).scale(75).translate(150, 450);
 const circle = new RegularPolygon(60).scale(75).translate(450, 450);
 const pacman = new Pacman().scale(75).translate(300, 300);
+const debug = { canvas: false, pixi: false, p5JS: false };
 
 const polygons = [triangle, square, pentagon, circle, pacman];
 const polygonSegments = polygons.flatMap(polygon => polygon.segments());
@@ -52,6 +53,11 @@ let mouse = new Point(1, 1);
 window.addEventListener('keydown', event => {
     if (event.key.toLowerCase() == 'p') pause = !pause;
     if (event.key.toLowerCase() == 'f') filled = !filled;
+    if (event.key.toLowerCase() == 'd') {
+        debug.canvas = true;
+        debug.pixi = true;
+        debug.p5JS = true;
+    }
 });
 
 (function startCanvas() {
@@ -76,6 +82,11 @@ window.addEventListener('keydown', event => {
         if (mouse.y > canvas.height) return;
 
         const rays = getRays(mouse);
+
+        if (debug.canvas) {
+            debug.canvas = false;
+            console.log('console', rays);
+        }
 
         context.fillStyle = canvas.style.borderColor;
         context.rect(0, 0, canvas.width, canvas.height);
@@ -171,6 +182,11 @@ window.addEventListener('keydown', event => {
 
         const rays = getRays(mouse);
 
+        if (debug.pixi) {
+            debug.pixi = false;
+            console.log('pixi', rays);
+        }
+
         graphics.clear();
 
         setColor(blue);
@@ -241,6 +257,11 @@ window.addEventListener('keydown', event => {
             if (mouse.y > canvas.height) return;
 
             const rays = getRays(mouse);
+
+            if (debug.p5JS) {
+                debug.p5JS = false;
+                console.log('p5JS', rays);
+            }
 
             p5context
                 .clear()
