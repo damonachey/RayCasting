@@ -147,7 +147,7 @@ window.addEventListener('keydown', event => {
         view: canvas,
         width: canvas.width,
         height: canvas.height,
-        backgroundColor: PIXI.utils.string2hex(background),
+        backgroundColor: background,
         antialias: true,
     });
     app.stage.addChild(graphics);
